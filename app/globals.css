@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 15, 23, 42;
+  --background-rgb: 248, 250, 252;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-rgb));
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 5px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* --- LIQUID BLOB ANIMATION --- */
+@keyframes blob {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+    border-radius: 24% 76% 35% 65% / 27% 36% 64% 73%;
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+    border-radius: 76% 24% 33% 67% / 68% 55% 45% 32%;
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+    border-radius: 42% 58% 16% 84% / 84% 27% 73% 16%;
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+    border-radius: 24% 76% 35% 65% / 27% 36% 64% 73%;
+  }
+}
+
+.animate-blob {
+  animation: blob 10s infinite alternate ease-in-out;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
