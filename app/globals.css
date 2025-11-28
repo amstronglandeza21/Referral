@@ -12,49 +12,41 @@ body {
   background: rgb(var(--background-rgb));
 }
 
-/* Custom Scrollbar */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 5px;
-}
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #334155;
-  border-radius: 5px;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #475569;
-}
+.custom-scrollbar::-webkit-scrollbar { width: 5px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 5px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
 
-/* --- LIQUID BLOB ANIMATION --- */
+/* --- LIQUID ANIMATION KEYFRAMES --- */
 @keyframes blob {
-  0% {
-    transform: translate(0px, 0px) scale(1);
-    border-radius: 24% 76% 35% 65% / 27% 36% 64% 73%;
-  }
-  33% {
-    transform: translate(30px, -50px) scale(1.1);
-    border-radius: 76% 24% 33% 67% / 68% 55% 45% 32%;
-  }
-  66% {
-    transform: translate(-20px, 20px) scale(0.9);
-    border-radius: 42% 58% 16% 84% / 84% 27% 73% 16%;
-  }
-  100% {
-    transform: translate(0px, 0px) scale(1);
-    border-radius: 24% 76% 35% 65% / 27% 36% 64% 73%;
-  }
+  0% { transform: translate(0px, 0px) scale(1); border-radius: 24% 76% 35% 65% / 27% 36% 64% 73%; }
+  33% { transform: translate(30px, -50px) scale(1.1); border-radius: 76% 24% 33% 67% / 68% 55% 45% 32%; }
+  66% { transform: translate(-20px, 20px) scale(0.9); border-radius: 42% 58% 16% 84% / 84% 27% 73% 16%; }
+  100% { transform: translate(0px, 0px) scale(1); border-radius: 24% 76% 35% 65% / 27% 36% 64% 73%; }
 }
 
-.animate-blob {
+/* --- DITO MO I-ADJUST ANG BLUR --- */
+.liquid-blob {
+  position: absolute;
+  border-radius: 40%;
+  mix-blend-mode: multiply;
+  
+  /* I-adjust mo ang value na ito para lumabo lalo */
+  filter: blur(150px); 
+  
+  /* I-adjust ito para kumapal o lumabnaw ang kulay */
+  opacity: 0.7;
+  
   animation: blob 10s infinite alternate ease-in-out;
 }
 
-.animation-delay-2000 {
-  animation-delay: 2s;
-}
+.animation-delay-2000 { animation-delay: 2s; }
+.animation-delay-4000 { animation-delay: 4s; }
 
-.animation-delay-4000 {
-  animation-delay: 4s;
+/* Frosted Glass Overlay */
+.frosted-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(255, 255, 255, 0.3); /* White tint opacity */
+  backdrop-filter: blur(10px); /* Blur ng glass sa ibabaw */
 }

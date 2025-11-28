@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { LayoutDashboard, Users, Gift, Share2, Settings } from 'lucide-react';
 import Sidebar from '@/components/Sidebar';
 import Header from '@/components/Header';
@@ -13,18 +13,64 @@ export default function Home() {
   const [activeItem, setActiveItem] = useState('Dashboard');
   const [isMounted, setIsMounted] = useState(false);
 
+  // --- REFS PARA SA MGA BLOBS ---
+  const interactiveRef = useRef<HTMLDivElement>(null); 
+  const blob1Ref = useRef<HTMLDivElement>(null);       
+  const blob2Ref = useRef<HTMLDivElement>(null);       
+  const blob3Ref = useRef<HTMLDivElement>(null);       
+
   useEffect(() => {
     setIsMounted(true);
     const savedSidebarState = localStorage.getItem('sidebar-state');
-    if (savedSidebarState !== null) {
-      setIsSidebarOpen(JSON.parse(savedSidebarState));
-    }
+    if (savedSidebarState !== null) setIsSidebarOpen(JSON.parse(savedSidebarState));
 
     const savedActiveItem = localStorage.getItem('active-item-state');
-    if (savedActiveItem !== null) {
-      setActiveItem(savedActiveItem);
-    }
+    if (savedActiveItem !== null) setActiveItem(savedActiveItem);
   }, []);
+
+  // --- PHYSICS ANIMATION LOGIC ---
+  useEffect(() => {
+    if (!isMounted) return;
+
+    let curX = 0;
+    let curY = 0;
+    let tgX = 0;
+    let tgY = 0;
+
+    const move = () => {
+      curX += (tgX - curX) / 20; 
+      curY += (tgY - curY) / 20;
+
+      if (interactiveRef.current) {
+        interactiveRef.current.style.transform = `translate(${Math.round(curX)}px, ${Math.round(curY)}px) translate(-50%, -50%)`;
+      }
+      
+      // Repulsion / Parallax
+      if (blob1Ref.current) {
+        blob1Ref.current.style.transform = `translate(${Math.round(curX / -25)}px, ${Math.round(curY / -25)}px)`;
+      }
+      if (blob2Ref.current) {
+        blob2Ref.current.style.transform = `translate(${Math.round(curX / 40)}px, ${Math.round(curY / 40)}px)`;
+      }
+      if (blob3Ref.current) {
+        blob3Ref.current.style.transform = `translate(${Math.round(curX / -30)}px, ${Math.round(curY / 30)}px)`;
+      }
+
+      requestAnimationFrame(move);
+    };
+
+    const handleMouseMove = (event: MouseEvent) => {
+      tgX = event.clientX;
+      tgY = event.clientY;
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    move();
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, [isMounted]);
 
   useEffect(() => {
     if (isMounted) {
@@ -35,7 +81,6 @@ export default function Home() {
 
   if (!isMounted) return null;
 
-  // --- Mobile Navigation ---
   const MobileNav = () => {
     const navItems = [
       { icon: LayoutDashboard, text: 'Home', id: 'Dashboard' },
@@ -46,27 +91,40 @@ export default function Home() {
     ];
 
     return (
-      <div className="md:hidden fixed bottom-4 left-4 right-4 h-20 rounded-2xl bg-white/40 backdrop-blur-xl border border-white/40 shadow-[0_8px_32px_0_rgba(31,38,135,0.15)] flex justify-around items-center z-50 ring-1 ring-white/50">
+      /* UPDATED MOBILE NAV:
+         - Fixed bottom-0 left-0 right-0 (Dikit sa baba)
+         - Full width (Wala nang rounded corners sa gilid ng container)
+         - Border-top lang ang meron para malinis
+      */
+      <div className="md:hidden fixed bottom-0 left-0 right-0 h-[88px] bg-white/70 backdrop-blur-2xl border-t border-white/50 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] flex justify-around items-start pt-3 z-50">
         {navItems.map((item) => {
           const isActive = activeItem === item.id;
           return (
             <button
               key={item.id}
               onClick={() => setActiveItem(item.id)}
-              className={`relative flex flex-col items-center justify-center w-14 h-14 rounded-xl transition-all duration-300 ${
-                isActive ? 'bg-white/70 shadow-sm -translate-y-2' : 'hover:bg-white/20'
+              className={`relative flex flex-col items-center justify-center w-16 h-14 rounded-xl transition-all duration-300 group ${
+                isActive ? '' : 'hover:bg-white/40'
               }`}
             >
+              {/* Active Background Glow (Optional, subtle lang) */}
+              {isActive && (
+                 <span className="absolute inset-0 bg-gradient-to-tr from-cyan-500/10 to-blue-500/10 rounded-xl blur-sm" />
+              )}
+
               <item.icon 
-                size={22} 
-                className={`transition-colors duration-300 ${isActive ? 'text-cyan-600' : 'text-slate-500'}`} 
+                size={24} 
+                className={`z-10 transition-all duration-300 ${isActive ? 'text-cyan-600 -translate-y-1' : 'text-slate-400 group-hover:text-slate-600'}`} 
                 strokeWidth={isActive ? 2.5 : 2}
               />
-              <span className={`text-[9px] mt-1 font-medium transition-colors ${isActive ? 'text-cyan-700' : 'text-slate-500'}`}>
+              <span className={`z-10 text-[10px] mt-1 font-medium transition-all duration-300 ${isActive ? 'text-cyan-700 translate-y-0 opacity-100' : 'text-slate-500 opacity-80'}`}>
                 {item.text}
               </span>
               
-              { isActive && <span className="absolute -bottom-2 w-1 h-1 bg-cyan-500 rounded-full shadow-[0_0_10px_rgba(6,182,212,0.5)]" /> }
+              {/* Active Indicator Line sa ilalim ng icon (Mas App-like) */}
+              {isActive && (
+                 <span className="absolute bottom-1 w-1 h-1 bg-cyan-500 rounded-full shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
+              )}
             </button>
           );
         })}
@@ -77,25 +135,33 @@ export default function Home() {
   return (
     <div className="flex h-screen bg-slate-50 relative overflow-hidden font-sans selection:bg-cyan-200 selection:text-cyan-900">
       
-      {/* --- LIQUID BACKGROUND ANIMATION (Updated for Extra Blur) --- */}
+      {/* --- LIQUID BACKGROUND ANIMATION --- */}
       <div className="fixed inset-0 w-full h-full overflow-hidden pointer-events-none z-0">
         
-        {/* Tinaasan ko ang BLUR value (from 100px to 160px) para sobrang soft ng edges */}
+        {/* INTERACTIVE CURSOR BLOB */}
+        <div 
+            ref={interactiveRef}
+            className="liquid-blob w-[500px] h-[500px] bg-gradient-to-r from-blue-400 to-cyan-300 opacity-90 mix-blend-multiply filter blur-[140px] will-change-transform"
+            style={{ top: 0, left: 0, zIndex: 0 }}
+        ></div>
+
+        {/* --- STATIC BLOBS --- */}
+        <div ref={blob1Ref} className="absolute top-0 left-0 w-full h-full will-change-transform transition-transform duration-75 ease-out">
+            <div className="liquid-blob top-[-10%] left-[-10%] w-[600px] h-[600px] bg-cyan-400 opacity-70 blur-[150px]"></div>
+        </div>
         
-        {/* Blob 1: Cyan (Top Left) */}
-        <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-cyan-400 opacity-60 rounded-full mix-blend-multiply filter blur-[160px] animate-blob"></div>
+        <div ref={blob2Ref} className="absolute top-0 left-0 w-full h-full will-change-transform transition-transform duration-75 ease-out">
+            <div className="liquid-blob top-[-10%] right-[-10%] w-[600px] h-[600px] bg-blue-400 opacity-70 blur-[150px] animation-delay-2000"></div>
+        </div>
         
-        {/* Blob 2: Blue (Top Right) */}
-        <div className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-blue-400 opacity-60 rounded-full mix-blend-multiply filter blur-[160px] animate-blob animation-delay-2000"></div>
+        <div ref={blob3Ref} className="absolute top-0 left-0 w-full h-full will-change-transform transition-transform duration-75 ease-out">
+            <div className="liquid-blob -bottom-32 left-[20%] w-[700px] h-[700px] bg-emerald-300 opacity-70 blur-[160px] animation-delay-4000"></div>
+        </div>
         
-        {/* Blob 3: Emerald (Bottom) */}
-        <div className="absolute -bottom-32 left-[20%] w-[700px] h-[700px] bg-emerald-300 opacity-60 rounded-full mix-blend-multiply filter blur-[180px] animate-blob animation-delay-4000"></div>
-        
-        {/* Glass Overlay: Tinaasan ko ang backdrop-blur (from 2px to 10px) para talagang frosted glass ang effect sa buong screen */}
-        <div className="absolute inset-0 bg-white/40 backdrop-blur-[10px]"></div>
+        {/* FROSTED GLASS OVERLAY */}
+        <div className="absolute inset-0 bg-white/30 backdrop-blur-[20px]"></div>
       </div>
 
-      {/* --- SIDEBAR (Desktop) --- */}
       <div className="hidden md:block h-full z-20 relative">
         <Sidebar 
           isOpen={isSidebarOpen} 
@@ -105,15 +171,12 @@ export default function Home() {
         />
       </div>
 
-      {/* --- MAIN CONTENT --- */}
       <main className="flex-1 flex flex-col h-screen overflow-hidden relative transition-all duration-300 z-10">
-        
-        {/* Header */}
         <div className="relative z-20 bg-white/10 backdrop-blur-sm shadow-sm">
           <Header title={activeItem} />
         </div>
 
-        {/* Content Scroll Area */}
+        {/* Tinaasan ang padding-bottom (pb-32) para hindi matakpan ng bagong nav bar ang content sa dulo */}
         <div className="flex-1 overflow-y-auto p-4 md:p-8 pb-32 md:pb-8 scroll-smooth">
            <div className="relative z-10">
              {activeItem === 'Dashboard' && <DashboardView />}

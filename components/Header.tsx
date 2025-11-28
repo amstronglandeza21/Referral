@@ -5,7 +5,7 @@ export default function Header({ title }: { title: string }) {
   return (
 
     <header className="h-16 bg-transparent flex items-center justify-between px-6 md:px-8 z-10 flex-shrink-0">
-      <h1 className="text-xl font-bold text-slate-800">{title}</h1>
+      <h1 className="text-xl font-bold text-slate-600">{title}</h1>
       
       <div className="flex items-center gap-4">
         <div className="hidden md:flex items-center bg-white/50 backdrop-blur-sm rounded-full px-3 py-1.5 border border-white/60 shadow-sm focus-within:ring-2 focus-within:ring-cyan-500/20 transition-all">
