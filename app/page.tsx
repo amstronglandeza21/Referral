@@ -77,18 +77,25 @@ export default function Home() {
   return (
     <div className="flex h-screen bg-slate-50 relative overflow-hidden font-sans selection:bg-cyan-200 selection:text-cyan-900">
       
-      {/* --- LIQUID BACKGROUND ANIMATION --- */}
+      {/* --- LIQUID BACKGROUND ANIMATION (Updated for Extra Blur) --- */}
       <div className="fixed inset-0 w-full h-full overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-cyan-400/40 rounded-full mix-blend-multiply filter blur-[80px] animate-blob"></div>
-        <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-blue-400/40 rounded-full mix-blend-multiply filter blur-[80px] animate-blob animation-delay-2000"></div>
-        <div className="absolute -bottom-32 left-[20%] w-[600px] h-[600px] bg-emerald-300/40 rounded-full mix-blend-multiply filter blur-[100px] animate-blob animation-delay-4000"></div>
-        <div className="absolute inset-0 bg-white/30 backdrop-blur-[1px]"></div>
+        
+        {/* Tinaasan ko ang BLUR value (from 100px to 160px) para sobrang soft ng edges */}
+        
+        {/* Blob 1: Cyan (Top Left) */}
+        <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-cyan-400 opacity-60 rounded-full mix-blend-multiply filter blur-[160px] animate-blob"></div>
+        
+        {/* Blob 2: Blue (Top Right) */}
+        <div className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-blue-400 opacity-60 rounded-full mix-blend-multiply filter blur-[160px] animate-blob animation-delay-2000"></div>
+        
+        {/* Blob 3: Emerald (Bottom) */}
+        <div className="absolute -bottom-32 left-[20%] w-[700px] h-[700px] bg-emerald-300 opacity-60 rounded-full mix-blend-multiply filter blur-[180px] animate-blob animation-delay-4000"></div>
+        
+        {/* Glass Overlay: Tinaasan ko ang backdrop-blur (from 2px to 10px) para talagang frosted glass ang effect sa buong screen */}
+        <div className="absolute inset-0 bg-white/40 backdrop-blur-[10px]"></div>
       </div>
 
       {/* --- SIDEBAR (Desktop) --- */}
-      {/* FIX: Tinanggal ko ang wrapper div na may 'bg-slate-900' at 'border-r'.
-          Ngayon, diretso na ang Sidebar component kaya wala nang dark line o gray background.
-      */}
       <div className="hidden md:block h-full z-20 relative">
         <Sidebar 
           isOpen={isSidebarOpen} 
@@ -101,8 +108,8 @@ export default function Home() {
       {/* --- MAIN CONTENT --- */}
       <main className="flex-1 flex flex-col h-screen overflow-hidden relative transition-all duration-300 z-10">
         
-        {/* Header - No Border */}
-        <div className="relative z-20 bg-white/30 backdrop-blur-md shadow-sm">
+        {/* Header */}
+        <div className="relative z-20 bg-white/10 backdrop-blur-sm shadow-sm">
           <Header title={activeItem} />
         </div>
 
